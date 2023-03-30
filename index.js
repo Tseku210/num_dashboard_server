@@ -34,9 +34,25 @@ app.get("/graph", (req, res) => {
 
 app.get("/subjects", (req, res) => {
   console.log("requesting subjects data");
-  const subjects = Subjects.map((item) => item["Монгол_нэр"]);
+  const subjects = Subjects.map((item) => ({
+    id: item["Хичээлийн_дугаар"],
+    name: item["Монгол_нэр"],
+  }));
   const uniqueSubjects = [...new Set(subjects)];
   res.send(uniqueSubjects);
+});
+
+app.get("/:subjectID/professors", (req, res) => {
+  console.log("requesting professors data");
+  const { subjectID } = req.params;
+  console.log(subjectID);
+  const subjectSchedules = ClassSchedules.filter(
+    (item) => item["Хичээлийн_дугаар"] === subjectID
+  );
+  const uniqueProfessors = [
+    ...new Set(subjectSchedules.map((item) => item["Заасан_багшийн_нэр"])),
+  ];
+  res.send(uniqueProfessors);
 });
 
 app.listen(PORT, () => {
