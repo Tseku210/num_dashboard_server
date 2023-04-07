@@ -3,7 +3,9 @@ const Data = require("./data/paper-journals.json");
 const WosData = require("./data/data.json");
 const Subjects = require("./data/subjects.json");
 const ClassSchedules = require("./data/class-schedule.json");
+const generateSchedules = require("./newScheduleGeneration.js");
 const express = require("express");
+const bodyParser = require("body-parser");
 
 // handle cors
 const cors = require("cors");
@@ -17,6 +19,7 @@ app.use(
     origin: "http://localhost:3000",
   })
 );
+app.use(bodyParser.json());
 
 app.get("/graph", (req, res) => {
   console.log("requesting graph data");
@@ -53,6 +56,15 @@ app.get("/:subjectID/professors", (req, res) => {
     ...new Set(subjectSchedules.map((item) => item["Заасан_багшийн_нэр"])),
   ];
   res.send(uniqueProfessors);
+});
+
+app.post("/schedule", (req, res) => {
+  const schedules = req.body;
+  console.log(schedules);
+
+  const allSchedules = generateSchedules(schedules.subjects);
+
+  res.send(allSchedules);
 });
 
 app.listen(PORT, () => {
