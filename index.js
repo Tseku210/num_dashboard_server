@@ -1,13 +1,12 @@
-// express init
 const Data = require("./data/paper-journals.json");
 const WosData = require("./data/data.json");
 const Subjects = require("./data/subjects.json");
 const ClassSchedules = require("./data/class-schedule.json");
+const Difficulties = require("./data/difficulties.json");
 const generateSchedules = require("./newScheduleGeneration.js");
 const express = require("express");
 const bodyParser = require("body-parser");
 
-// handle cors
 const cors = require("cors");
 
 const PORT = process.env.PORT || 3001;
@@ -48,7 +47,6 @@ app.get("/subjects", (req, res) => {
 app.get("/:subjectID/professors", (req, res) => {
   console.log("requesting professors data");
   const { subjectID } = req.params;
-  console.log(subjectID);
   const subjectSchedules = ClassSchedules.filter(
     (item) => item["Хичээлийн_дугаар"] === subjectID
   );
@@ -65,6 +63,13 @@ app.post("/schedule", (req, res) => {
   const allSchedules = generateSchedules(schedules.subjects);
 
   res.send(allSchedules);
+});
+
+app.get("/:subjectName/difficulty", (req, res) => {
+  const { subjectName } = req.params;
+  const subject = Difficulties.find((item) => item["Course"] === subjectName);
+  console.log(subject);
+  res.send(subject);
 });
 
 app.listen(PORT, () => {
