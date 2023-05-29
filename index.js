@@ -6,6 +6,7 @@ const Difficulties = require("./data/difficulties.json");
 const generateSchedules = require("./newScheduleGeneration.js");
 const express = require("express");
 const bodyParser = require("body-parser");
+const { PythonShell } = require("python-shell");
 
 const cors = require("cors");
 
@@ -70,6 +71,28 @@ app.get("/:subjectName/difficulty", (req, res) => {
   const subject = Difficulties.find((item) => item["Course"] === subjectName);
   console.log(subject);
   res.send(subject);
+});
+
+app.post("/recommendations", async (req, res) => {
+  console.log("course", req.body);
+  const course_id = req.body.course_id;
+  const options = {
+    scriptPath: "./", // Set the path to your Python script
+    args: [course_id],
+  };
+
+  PythonShell.run("recommend.py", options, (err, results) => {
+    if (err) {
+      res
+        .status(500)
+        .send({ error: "An error occurred while generating recommendations" });
+      console.error(err);
+      return;
+    }
+
+    const recommendations = JSON.parse(results[0]);
+    res.send(recommendations);
+  });
 });
 
 app.listen(PORT, () => {
